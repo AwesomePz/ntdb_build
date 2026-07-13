@@ -11,6 +11,11 @@ mkdir -p $DEST && cd $DEST
 
 wget -c https://ftp.ncbi.nlm.nih.gov/blast/db/{nt-nucl-metadata.json,taxdb-metadata.json,taxdb.tar.gz,taxdb.tar.gz.md5}
 
+axel -c -n 8 https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz
+tar xvzf taxdump.tar.gz && rm -rf taxdump.tar.gz
+mkdir -p $HOME/.taxonkit
+mv names.dmp nodes.dmp delnodes.dmp merged.dmp citations.dmp division.dmp gc.prt gencode.dmp images.dmp readme.txt $HOME/.taxonkit
+
 for i in $(seq 0 $NUM); do
     axel -c -n 8 https://ftp.ncbi.nlm.nih.gov/blast/db/nt.$(printf %03d $i).tar.gz
     axel -c -n 4 https://ftp.ncbi.nlm.nih.gov/blast/db/nt.$(printf %03d $i).tar.gz.md5
