@@ -14,19 +14,13 @@ source /home/zpy/software/miniconda3/etc/profile.d/conda.sh
 conda activate blast
 
 BASE="/home/zpy/Project/ntsub"
-#ALL="$BASE/00.allsub"
 NT="nt"
 P=1
 
 DBS=(
-#"amphi|Amphibia|8292"
 "bac|Bacteria|2"
-#"bird|Aves|8782"
 "fish|Actinopterygii|7898"
 "fungi|Fungi|4751"
-#"insect|Arthropoda|6656"
-#"moll|Mollusca|6447"
-#"plant|Viridiplantae|33090"
 )
 
 build() {
@@ -38,7 +32,6 @@ local o="$d/$f"
 
 [ -f "$o.nal" ] && { echo "[skip] ${s}_${f}"; return; }
 
-#mkdir -p "$ALL"
 mkdir -p "$d" && cd "$d"
 blastdbcmd -db $NT -taxids $t -outfmt "%a %T" -out ${f}_map.txt
 blastdbcmd -db $NT -taxids $t -outfmt "%f" -out ${f}.fa
@@ -48,45 +41,6 @@ ln -sf $d/* $ALL/
 echo "[done] ${s}_${f}"
 }
 
-#build_rept() {
-#local d="$BASE/rept_reptilia"
-#local o="$d/reptilia"
-
-#[ -f "$o.nal" ] && { echo "[skip] rept_reptilia"; return; }
-
-#mkdir -p $d && cd $d
-#for t in "Lepidosauria|8504" "Testudines|8459" "Crocodylia|1294634"; do
-#    name=$(echo $t|cut -d'|' -f1)
-#    taxid=$(echo $t|cut -d'|' -f2)
-#    blastdbcmd -db $NT -taxids $taxid -outfmt "%a %T" -out ${name}_map.txt
-#    blastdbcmd -db $NT -taxids $taxid -outfmt "%f" -out ${name}.fa
-#done
-
-#cat Lepidosauria.fa Testudines.fa Crocodylia.fa > reptilia.fa
-#cat Lepidosauria_map.txt Testudines_map.txt Crocodylia_map.txt > reptilia_map.txt
-#sed -i 's/ \([0-9]\+\)$/\t\1/' reptilia_map.txt
-#makeblastdb -in reptilia.fa -dbtype nucl -parse_seqids -taxid_map reptilia_map.txt -out reptilia
-
-#ln -sf $d/* $ALL/
-#echo "[done] rept_reptilia"
-#}
-
-#export -f build build_rept
-#export BASE ALL NT
-
-# 并行构建普通库
 printf "%s\n" "${DBS[@]}" | xargs -P $P -I {} bash -c 'build "$@"' _ {}
-# 构建爬行类
-#build_rept
-
-#blastdb_aliastool -dblist "Amphibia Aves Actinopterygii Arthropoda Mollusca reptilia" -dbtype nucl -title "animal" -out $ALL/animal
-#blastdb_aliastool -dblist "Amphibia Bacteria Aves Actinopterygii Fungi Arthropoda Mollusca Viridiplantae reptilia" -dbtype nucl -title "all" -out $ALL/all
-
-#echo ""
-#ls $ALL
 
 conda deactivate
-
-#检查确认无误后删除
-#for fa in *_*/*.fa; do rm -rf "$fa"; done
-#for map in *_*/*_map.txt; do rm -rf "$map"; done
